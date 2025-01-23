@@ -1,15 +1,22 @@
 const express = require("express");
 const app = express();
 
-app.use("/",(req,res)=>{
-    res.send("everything starts here");
+app.get("/user",(req,res)=>{
+  res.send({firstName: "John", lastName: "Doe"});
+})
+app.post("/user",(req,res)=>{
+  res.send("user created successfully");
+})
+app.delete("/user",(req,res)=>{
+  res.send("user deleted successfully");
+})
+app.patch("/user",(req,res)=>{
+  res.send("user updated successfully");
 })
 app.use("/test", (req, res) => {
-  res.send("Hello World");
+  res.send("testing the test route");
 });
-app.use("/namaste", (req, res) => {
-  res.send("namaste World");
-});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
