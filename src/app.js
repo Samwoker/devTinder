@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
 
+app.use("/user",(req,res)=>{
+  res.send("i dominate everything");
+})
 app.get("/user",(req,res)=>{
   res.send({firstName: "John", lastName: "Doe"});
 })
