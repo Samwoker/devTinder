@@ -3,9 +3,13 @@ const app = express();
 const { adminAuth, userAuth } = require("./middlewares/auth");
 
 app.use("/admin", adminAuth);
-app.get("/user", userAuth, (req, res) => {
+app.use("/user", userAuth, (req, res) => {
   res.send("getting user data");
 });
+
+app.post("/user/login",(req,res)=>{
+  res.send("logging in");
+})
 app.get("/admin/getAllData", (req, res) => {
   res.send("getting all data");
 });
