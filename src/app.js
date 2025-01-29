@@ -39,6 +39,16 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("no data sent");
   }
 });
+app.delete("/user",async (req,res)=>{
+  const userId=req.body.userId;
+  try{
+    await User.findByIdAndDelete({_id:userId});
+   // await User.findByIdAndDelete(userId);
+    res.send("user deleted successfully");
+  }catch (err) {
+    res.status(400).send("no data sent");
+  }
+})
 
 connectDB()
   .then(() => {
