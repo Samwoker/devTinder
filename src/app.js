@@ -38,14 +38,14 @@ app.post("/signup", async (req, res) => {
       "gender",
       "age",
     ];
-    const isAllowedData = Object.key().every((k) => ALLOWED_DATA.includes(k));
+    const isAllowedData = Object.keys(req.body).every((k) => ALLOWED_DATA.includes(k));
     if (!isAllowedData) {
       throw new Error("enter only the allowed data to register");
     }
     await user.save();
     res.send("user signed up successfully");
   } catch (err) {
-    res.status(400).send("no data sent");
+    res.status(400).send("no data sent"+err.message);
   }
 });
 app.delete("/user", async (req, res) => {
@@ -63,7 +63,7 @@ app.patch("/user", async (req, res) => {
   const data = req.body;
   try {
     const ALLOWED_UPDATES = ["photoUrl", "about", "userId", "age", "gender"];
-    const isAllowedUpdate = Object.keys().every((k) =>
+    const isAllowedUpdate = Object.keys(data).every((k) =>
       ALLOWED_UPDATES.includes(k)
     );
     if (!isAllowedUpdate) {
