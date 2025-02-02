@@ -1,2 +1,0 @@
-ok3nKHU1hYTG57FA
-mongodb+srv://samwoker112:ok3nKHU1hYTG57FA@namastenode.edskb.mongodb.net/
