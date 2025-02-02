@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const User = require("./config/models/user");
 const connectDB = require("./config/database");
+const { validateSignUpApi, validateLoginApi } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
@@ -28,24 +30,39 @@ app.get("/feed", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const user = User(req.body);
   try {
-    const ALLOWED_DATA = [
-      "firstName",
-      "lastName",
-      "emailId",
-      "password",
-      "gender",
-      "age",
-    ];
-    const isAllowedData = Object.keys(req.body).every((k) => ALLOWED_DATA.includes(k));
-    if (!isAllowedData) {
-      throw new Error("enter only the allowed data to register");
-    }
+    const { firstName, lastName, emailId, password } = req.body;
+    validateSignUpApi(req);
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
     await user.save();
     res.send("user signed up successfully");
   } catch (err) {
-    res.status(400).send("no data sent"+err.message);
+    res.status(400).send("no data sent" + err.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    validateLoginApi(req);
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid Credentials");
+    }else{
+         res.send("Login Successful");
+    }
+  } catch (err) {
+    res.status(400).send("no data sent " + err.message);
   }
 });
 app.delete("/user", async (req, res) => {
