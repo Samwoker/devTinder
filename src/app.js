@@ -54,7 +54,9 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid Credentials");
     } else {
       const token = await user.getJWT();
-      res.cookie("token", token);
+      res.cookie("token", token,{
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      });
       res.send("Login Successful");
     }
   } catch (err) {
