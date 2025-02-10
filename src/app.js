@@ -1,68 +1,18 @@
 const express = require("express");
 const app = express();
-const User = require("./config/models/user");
 const connectDB = require("./config/database");
-const { validateSignUpApi, validateLoginApi } = require("./utils/validation");
-const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    const user = req.user;
-    res.send(user);
-  } catch (err) {
-    res.status(400).send("no data sent " + err.message);
-  }
-});
-app.post("/signup", async (req, res) => {
-  try {
-    const { firstName, lastName, emailId, password } = req.body;
-    validateSignUpApi(req);
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = User({
-      firstName,
-      lastName,
-      emailId,
-      password: passwordHash,
-    });
-    await user.save();
-    res.send("user signed up successfully");
-  } catch (err) {
-    res.status(400).send("no data sent" + err.message);
-  }
-});
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
-app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  const user = req.user;
-  res.send(user.firstName + " is sent you a connection request");
-});
-app.post("/login", async (req, res) => {
-  try {
-    validateLoginApi(req);
-    const { emailId, password } = req.body;
-    const user = await User.findOne({ emailId: emailId });
-    if (!user) {
-      throw new Error("Invalid Credentials");
-    }
-    const isPasswordValid = await user.validatePassword(password);
-    if (!isPasswordValid) {
-      throw new Error("Invalid Credentials");
-    } else {
-      const token = await user.getJWT();
-      res.cookie("token", token,{
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-      });
-      res.send("Login Successful");
-    }
-  } catch (err) {
-    res.status(400).send("no data sent " + err.message);
-  }
-});
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
 
 connectDB()
   .then(() => {
